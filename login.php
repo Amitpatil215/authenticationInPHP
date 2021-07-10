@@ -1,5 +1,36 @@
 <?php
+session_start();
+include("connection.php");
+include("functions.php");
 
+// is user pressed log in button
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    // something was posted
+    $user_name = $_POST['user_name'];
+    $password = $_POST['password'];
+
+    if (!empty($user_name) && !(empty($password))) {
+        // read from database
+        $query = "select * from users where user_name='$user_name' limit 1";
+        $result = mysqli_query($con, $query);
+
+        if ($result && mysqli_num_rows($result) > 0) {
+            $user_data = mysqli_fetch_assoc($result);
+            if ($user_data['password'] === $password) {
+
+                // set session id
+                $_SESSION['user_id'] = $user_data['user_id'];
+
+                // redirect to home page
+                header("Location:index.php");
+                die;
+            }
+        } else
+            echo "Wrong user name or password";
+    } else {
+        echo "Please enter some valid information";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
